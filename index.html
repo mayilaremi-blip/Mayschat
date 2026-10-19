@@ -314,7 +314,7 @@ async function onSignal(p){if(!p||!p.from||p.from===U.id)return;const d=p.data||
  if(p.kind==="hangup"){if(RING&&RING.from===p.from){RING.el.remove();clearTimeout(RING.t);RING=null;toast(`Appel manqué de <b>${e(pname(p.from))}</b>.`)}else if(CALL&&CALL.peer===p.from){toast("Appel terminé.");endCall(false)}}}
 function endCall(notify){if(!CALL)return;const c=CALL;CALL=null;clearTimeout(c.ring);if(notify)sendSig(c.peer,"hangup");try{c.pc&&c.pc.close()}catch(x){}c.local.getTracks().forEach(t=>t.stop());const el=$("call");if(el)el.remove();
  if(c.isCaller)sb.from("messages").insert({recipient:c.peer,body:c.at?"📹 Appel vidéo terminé ("+fmtDur(Date.now()-c.at)+")":"📹 Appel manqué"}).select().single().then(r=>{if(r.data&&!MSG.some(x=>x.id===r.data.id)){MSG.push(r.data);if(view==="chat"&&peer===c.peer)paintChat();else refresh()}})}
-boot();
+</script><script src="plus.js"></script><script>boot();
 
 </script>
 </body>
