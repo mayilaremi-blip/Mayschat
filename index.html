@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1A78BC">
+<title>Mayschat</title>
+<style>
+:root{--hd:#1A78BC;--acc:#1673B6;--bg:#fff;--bg2:#F0F2F5;--ink:#111B21;--mute:#667781;--line:#E6EAEE;--out:#D9EEFC;--in:#fff;--wall:#EAF4FB;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hd:#0F3A57;--bg:#0B141A;--bg2:#111B21;--ink:#E9EDEF;--mute:#8696A0;--line:#222D34;--out:#12476B;--in:#1F2C33;--wall:#0B141A}}
+:root[data-theme="dark"]{--hd:#0F3A57;--bg:#0B141A;--bg2:#111B21;--ink:#E9EDEF;--mute:#8696A0;--line:#222D34;--out:#12476B;--in:#1F2C33;--wall:#0B141A}
+*{box-sizing:border-box}html,body{height:100%}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;max-width:560px;margin:0 auto}
+button,input,textarea{font:inherit;color:inherit}
+#app{display:flex;flex-direction:column;height:100%}
+.top{background:var(--hd);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.top h1{margin:0;font-size:20px;flex:1}.top button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}
+.view{flex:1;overflow-y:auto;background:var(--bg)}
+nav{display:flex;border-top:1px solid var(--line);background:var(--bg)}
+nav button{flex:1;background:none;border:0;padding:8px 0 10px;color:var(--mute);cursor:pointer;font-size:12px;position:relative}
+nav button svg{display:block;margin:0 auto 2px;width:24px;height:24px;fill:currentColor}
+nav button[aria-selected=true]{color:var(--hd)}nav button[aria-selected=true]::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;background:var(--acc);border-radius:0 0 3px 3px}
+:root[data-theme="dark"] nav button[aria-selected=true]{color:var(--acc)}
+.item{display:flex;gap:12px;padding:10px 16px;align-items:center;cursor:pointer;border-bottom:1px solid var(--line)}
+.item:active{background:var(--bg2)}.item .b{flex:1;min-width:0}.item .b p{margin:0;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.item .meta{text-align:right;font-size:12px;color:var(--mute)}.badge{display:inline-block;background:var(--acc);color:#fff;border-radius:99px;min-width:20px;padding:1px 6px;font-weight:700;margin-top:4px}
+.av{width:50px;height:50px;border-radius:50%;flex:none;background-size:cover;background-position:center;color:#fff;display:grid;place-items:center;font-weight:600;font-size:18px}
+.ring{padding:3px;border-radius:50%;border:3px solid var(--acc);flex:none}.ring.seen{border-color:var(--line)}
+.sec{padding:10px 16px;color:var(--hd);font-weight:600;font-size:13px;background:var(--bg2)}
+.fab{position:absolute;right:16px;bottom:78px;width:56px;height:56px;border-radius:16px;border:0;background:var(--acc);color:#fff;font-size:26px;box-shadow:0 3px 10px #0004;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.prod{background:var(--bg2);border-radius:12px;overflow:hidden;cursor:pointer}
+.prod .im{aspect-ratio:1;background-size:cover;background-position:center;display:grid;place-items:center;font-size:44px}
+.prod div.t{padding:8px 10px}.prod b{display:block}.prod span{color:var(--hd);font-weight:700}.prod small{display:block;color:var(--mute)}
+.form{padding:20px;display:flex;flex-direction:column;gap:12px}
+.form input,.form textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.form select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.sk{border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:99px;padding:6px 14px;margin:0 6px 6px 0;cursor:pointer;font-size:14px;text-transform:capitalize}.sk.on{background:var(--acc);border-color:var(--acc);color:#fff}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+#v>*{animation:up .25s ease both}
+.btn,.send,.sk,nav button{transition:transform .1s}.btn:active,.send:active,.sk:active,nav button:active{transform:scale(.95)}
+.m{animation:none}.m.last{animation:up .2s ease both}
+.rx{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:0 6px;font-size:12px;margin:2px 4px 0 0;animation:pop .25s}
+.mb{display:flex;gap:10px;background:var(--bg);border-radius:99px;padding:4px 12px;box-shadow:0 2px 8px #0003;align-self:flex-start;animation:pop .2s}
+.rp{border-left:3px solid var(--acc);background:#0001;padding:2px 8px;border-radius:6px;font-size:12px;margin-bottom:4px;opacity:.8}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.btn{background:var(--hd);color:#fff;border:0;border-radius:24px;padding:12px 20px;font-weight:600;cursor:pointer}
+.btn.o{background:none;color:var(--hd);border:1px solid var(--hd)}:root[data-theme="dark"] .btn.o{color:var(--acc);border-color:var(--acc)}
+.chips span{display:inline-block;background:var(--bg2);border-radius:99px;padding:3px 12px;margin:4px 6px 0 0;font-size:13px}
+.chips span.on{background:var(--acc);color:#fff}
+.logo{display:block;margin:10px auto}
+.chat{background:var(--wall);flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:4px}
+.m{max-width:80%;padding:6px 10px;border-radius:10px;background:var(--in);box-shadow:0 1px 1px #0002;word-wrap:break-word}
+.m.me{align-self:flex-end;background:var(--out)}.m small{display:block;text-align:right;color:var(--mute);font-size:11px}
+.bar{display:flex;gap:8px;padding:8px;background:var(--bg2);align-items:center}
+.bar input{flex:1;border:0;border-radius:22px;padding:11px 16px;background:var(--bg)}
+.send{width:44px;height:44px;border-radius:50%;border:0;background:var(--hd);color:#fff;cursor:pointer;font-size:18px}
+.toast{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:10px;right:10px;max-width:540px;margin:0 auto;background:var(--bg);color:var(--ink);border-left:5px solid var(--acc);border-radius:10px;padding:12px 14px;box-shadow:0 4px 16px #0005;transform:translateY(-150%);transition:transform .3s;z-index:20;cursor:pointer}
+.toast.show{transform:none}
+.sv{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px;text-align:center;color:#fff;font-size:26px;font-weight:600}
+.sv i{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:10px;height:3px;background:#fff;width:0;transition:width 5s linear}
+.sv u{position:absolute;top:calc(24px + env(safe-area-inset-top,0px));left:14px;font-size:15px;font-weight:400;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="toast" id="toast" role="status"></div>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+const SBURL="https://eaikwnehurjrjprtfiko.supabase.co",SBKEY="sb_publishable__TB-nVdE-pGKTo5QWFcgSQ_dTgcRaz5";
+const sb=supabase.createClient(SBURL,SBKEY);
+const $=i=>document.getElementById(i);
+const e=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LOGO='<svg class="logo" width="96" height="96" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5CC4F7"/><stop offset="1" stop-color="#1A78BC"/></linearGradient></defs><rect width="120" height="120" rx="28" fill="url(#g)"/><path d="M36 14H84A22 22 0 0 1 106 36V68A22 22 0 0 1 84 90H56L36 106V90H36A22 22 0 0 1 14 68V36A22 22 0 0 1 36 14Z" fill="#fff"/><circle cx="46" cy="38" r="5.5" fill="#1A4F7A"/><circle cx="74" cy="38" r="5.5" fill="#1A4F7A"/><path d="M25 52Q32 72 53 73" fill="none" stroke="#29A3E8" stroke-width="13" stroke-linecap="round"/><path d="M95 52Q88 72 67 73" fill="none" stroke="#1A5C94" stroke-width="13" stroke-linecap="round"/><ellipse cx="54" cy="73" rx="10.5" ry="9" fill="#F4C08A"/><ellipse cx="66" cy="73" rx="10.5" ry="9" fill="#8A5636" stroke="#fff" stroke-width="1.5"/><path d="M57 68.500q3.500 4.500 0 9M61 67.500q3.500 5.500 0 11" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".9"/></svg>';
+const COL=["#1A78BC","#C2571A","#6A4C93","#2E7D32","#AD1457","#37474F"];
+const IC={c:"M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-6 4V6a2 2 0 012-2z",k:"M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM8 12h8v2H8v-2zm0 4h8v2H8v-2z",p:"M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"};
+const ST={demande:"demandé",discussion:"en discussion",envoye:"envoyé",signe:"signé",refuse:"refusé"};
+const CUR=[["EUR","€ Euro"],["XOF","F CFA (Afrique de l’Ouest)"],["XAF","F CFA (Afrique centrale)"],["USD","$ Dollar US"],["CAD","$ Dollar canadien"],["GBP","£ Livre sterling"],["CHF","CHF Franc suisse"],["MAD","DH Dirham marocain"],["DZD","DA Dinar algérien"],["TND","DT Dinar tunisien"],["NGN","₦ Naira"],["GHS","GH₵ Cedi"],["KES","KSh Shilling kényan"],["CDF","FC Franc congolais"],["GNF","FG Franc guinéen"],["HTG","G Gourde"],["MGA","Ar Ariary"]];
+const KT=["Prestation de service","Vente ou échange","Partenariat","Sous-traitance"];
+const PHOTO_RE=/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,80}$/,CHATIMG_RE=/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9]{10,}\.jpg$/;
+let U=null,ME=null,PR=new Map(),MSG=[],CTR=[],tab="c",peer=null,REPLY="",Q="",QC="",QA=false,ready=false,view="list",IMG={},CHAT=null,PEND={};
+const nz=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const key=s=>nz(s).replace(/[^\p{L}\p{N}]/gu,"").slice(0,5);
+const hs=(a,x)=>(a||[]).some(y=>key(y)===key(x));
+const isPro=p=>!!(p&&p.skills&&p.skills.length);
+const pname=id=>(PR.get(id)||{}).name||"Membre";
+const hhmm=t=>{const d=new Date(t);return d.getHours()+":"+("0"+d.getMinutes()).slice(-2)};
+const label=p=>p.account_type==="entreprise"?"Entreprise · "+(p.company||""):(p.specialty||(p.skills&&p.skills[0])||"Membre");
+const ls={get(k){try{return localStorage.getItem(k)}catch(x){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(x){}}};
+function av(p,sz){sz=sz||50;const st=`width:${sz}px;height:${sz}px;`;
+ if(p&&p.photo_path&&PHOTO_RE.test(p.photo_path))return`<div class="av" style="${st}background-image:url(${SBURL}/storage/v1/object/public/avatars/${p.photo_path})"></div>`;
+ const i=((p&&p.name)||"?").split(" ").map(x=>x[0]||"").join("").slice(0,2).toUpperCase();let h=0;for(const c of String((p&&p.id)||""))h=(h+c.charCodeAt(0))%6;
+ return`<div class="av" style="${st}background:${COL[h]}">${e(i)}</div>`}
+function toast(t,f){const el=$("toast");el.innerHTML=t;el.className="toast show";
+ try{if("Notification" in window&&Notification.permission==="granted"&&document.hidden)new Notification("Mayschat",{body:el.textContent})}catch(x){}
+ el.onclick=()=>{el.className="toast";f&&f()};clearTimeout(toast.k);toast.k=setTimeout(()=>el.className="toast",5000)}
+function ask(html,yes,lab,noCancel,no){const d=document.createElement("div");d.style.cssText="position:fixed;inset:0;background:#0008;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px";
+ d.innerHTML=`<div style="background:var(--bg);color:var(--ink);border-radius:16px;padding:20px;max-width:360px;width:100%"><p style="margin:0 0 16px">${html}</p><div style="display:flex;gap:8px"><button class="btn" id="aY" style="flex:1">${lab}</button>${noCancel?"":'<button class="btn o" id="aN" style="flex:1">Plus tard</button>'}</div></div>`;
+ document.body.appendChild(d);$("aY").onclick=()=>{d.remove();yes()};if($("aN"))$("aN").onclick=()=>{d.remove();no&&no()};return d}
+function shrink(file,max,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(b=>cb(b),"image/jpeg",.75)};im.onerror=()=>toast("Image illisible.");im.src=r.result};r.readAsDataURL(file)}
+function money(a,c){if(a==null||a===""||!c)return"";try{return new Intl.NumberFormat("fr-FR",{style:"currency",currency:c,maximumFractionDigits:2}).format(Number(a))}catch(x){return a+" "+c}}
+function authMsg(m){m=String(m||"");if(/invalid login/i.test(m))return"E-mail ou mot de passe incorrect.";if(/already registered|already been registered/i.test(m))return"Cet e-mail a déjà un compte.";if(/password should|at least/i.test(m))return"Mot de passe trop court (6 caractères minimum).";if(/valid email|invalid.*email/i.test(m))return"Adresse e-mail invalide.";if(/rate limit/i.test(m))return"Trop d’essais. Réessayez dans quelques minutes.";return m}
+
+/* ---------- Écrans d'entrée ---------- */
+function welcome(){
+ $("app").innerHTML=`<div class="view" style="display:flex;flex-direction:column;justify-content:space-between;text-align:center;padding:40px 28px 28px;background:linear-gradient(#EAF6FD,#fff)"><div style="margin-top:40px">${LOGO}<h1 style="margin:14px 0 6px;color:#1673B6">Bienvenue sur Mayschat</h1><p style="margin:0 0 8px;color:#1673B6;font-weight:600">La messagerie des savoir-faire</p><p style="margin:0;color:#667781">Discutez, collaborez et signez avec des professionnels qui partagent vos compétences.</p></div><div><p style="color:#667781;font-size:13px">Touchez « Accepter et continuer » pour accepter les <a href="#" id="lt" style="color:#1673B6">conditions d’utilisation</a> et la <a href="#" id="lp" style="color:#1673B6">politique de confidentialité</a>.</p><button class="btn" id="ac" style="width:100%;padding:14px">Accepter et continuer</button></div></div>`;
+ $("lt").onclick=ev=>{ev.preventDefault();ask("<b>Conditions d’utilisation</b><br><br>Mayschat est en phase de test. Vos profils, messages et contrats sont enregistrés pour faire fonctionner l’application. Les contrats signés ici n’ont pas de valeur juridique garantie.<br><br><i>Texte provisoire, à remplacer par des conditions rédigées avec un juriste.</i>",()=>{},"Fermer",true)};
+ $("lp").onclick=ev=>{ev.preventDefault();ask("<b>Politique de confidentialité</b><br><br>Nous enregistrons votre e-mail, votre nom, votre ville, vos compétences, votre photo, vos messages et vos contrats. Les messages et contrats ne sont visibles que par les personnes concernées. Les profils sont visibles par les membres.<br><br><i>Texte provisoire, à remplacer par une politique rédigée avec un juriste.</i>",()=>{},"Fermer",true)};
+ $("ac").onclick=perms}
+function perms(){
+ const row=(id,ic,t,d)=>`<div class="item" style="cursor:default"><div style="font-size:28px">${ic}</div><div class="b"><b>${t}</b><p style="white-space:normal">${d}</p></div><button class="btn o" id="${id}" style="padding:8px 14px">Autoriser</button></div>`;
+ $("app").innerHTML=`<div class="view" style="background:linear-gradient(#EAF6FD,#fff)"><div style="text-align:center;padding:36px 20px 8px">${LOGO}<h2 style="margin:8px 0 4px;color:#1673B6">Autorisations</h2><p style="margin:0;color:#667781">Mayschat a besoin de ces accès pour partager des photos et vous prévenir.</p></div>${row("pc","📷","Appareil photo","Prendre des photos pour votre profil et vos discussions.")}${row("pp","🖼️","Photos","Choisir des images de votre téléphone.")}${row("pn","🔔","Notifications","Être prévenu quand un professionnel de votre domaine s’inscrit.")}<div style="padding:20px"><button class="btn" id="pgo" style="width:100%;padding:14px">Continuer</button></div></div>`;
+ const mark=(id,ok,msg)=>{const b=$(id);b.textContent=ok?(id==="pp"?"✓ Prêt":"✓ Autorisé"):msg;b.disabled=true};
+ $("pc").onclick=()=>{if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){toast(e(camErr()));return mark("pc",0,"Indisponible ici")}navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(s=>{s.getTracks().forEach(t=>t.stop());mark("pc",1)}).catch(er=>{toast(e(camErr(er)));mark("pc",0,"Non autorisé")})};
+ $("pp").onclick=()=>mark("pp",1);
+ $("pn").onclick=()=>{if(!("Notification" in window))return mark("pn",0,"Indisponible ici");try{Notification.requestPermission().then(r=>mark("pn",r==="granted","Refusé")).catch(()=>mark("pn",0,"Indisponible ici"))}catch(x){mark("pn",0,"Indisponible ici")}};
+ $("pgo").onclick=()=>{ls.set("mayschat_ok","1");authScreen("signup")}}
+function authScreen(mode){const su=mode==="signup";
+ $("app").innerHTML=`<div class="view"><div class="form" style="margin-top:24px;text-align:center">${LOGO}<h2 style="margin:0">${su?"Créer un compte":"Se connecter"}</h2>${su?'<input id="an" placeholder="Votre nom" autocomplete="name">':""}<input id="ae" type="email" placeholder="Adresse e-mail" autocomplete="email"><input id="ap" type="password" placeholder="Mot de passe (6 caractères minimum)" autocomplete="${su?"new-password":"current-password"}"><button class="btn" id="ago">${su?"Créer mon compte":"Se connecter"}</button><p id="aer" style="color:#C62828;margin:0"></p><button class="btn o" id="asw">${su?"J’ai déjà un compte":"Créer un compte"}</button></div></div>`;
+ $("asw").onclick=()=>authScreen(su?"login":"signup");
+ $("ago").onclick=async()=>{const em=$("ae").value.trim(),pw=$("ap").value,nm=su?$("an").value.trim():"",er=m=>{$("aer").textContent=m};
+  if(!em||!pw||(su&&!nm))return er("Remplissez tous les champs.");
+  $("ago").disabled=true;
+  const r=su?await sb.auth.signUp({email:em,password:pw,options:{data:{name:nm}}}):await sb.auth.signInWithPassword({email:em,password:pw});
+  $("ago").disabled=false;
+  if(r.error)return er(authMsg(r.error.message));
+  if(!r.data||!r.data.session)return er("Compte créé. Confirmez votre e-mail, puis connectez-vous.");
+  boot()}}
+
+/* ---------- Démarrage et données ---------- */
+async function loadAll(){
+ const [p,m,c]=await Promise.all([sb.from("profiles").select("*"),sb.from("messages").select("*").order("created_at"),sb.from("contracts").select("*").order("created_at")]);
+ if(p.error||m.error||c.error){toast("Chargement impossible : "+e((p.error||m.error||c.error).message));return false}
+ PR=new Map(p.data.map(x=>[x.id,x]));MSG=m.data;CTR=c.data;ME=PR.get(U.id)||null;return true}
+async function boot(){
+ const {data}=await sb.auth.getSession();const s=data&&data.session;
+ if(!s){ls.get("mayschat_ok")?authScreen("login"):welcome();return}
+ U=s.user;let ok=await loadAll();
+ for(let i=0;i<3&&ok&&!ME;i++){await new Promise(r=>setTimeout(r,700));ok=await loadAll()}
+ if(!ok||!ME){$("app").innerHTML=`<div class="view"><div class="form" style="margin-top:40px;text-align:center"><p>Impossible de charger votre profil.</p><button class="btn" id="rt">Réessayer</button></div></div>`;$("rt").onclick=boot;return}
+ live();ready=true;
+ if(!isPro(ME))onboard();else{sb.from("profiles").update({last_seen:new Date().toISOString()}).eq("id",U.id).then(()=>{});shell()}}
+function live(){sb.removeAllChannels&&sb.removeAllChannels();
+ sb.channel("mayschat")
+ .on("postgres_changes",{event:"*",schema:"public",table:"profiles"},pl=>{const r=pl.new;if(!r||!r.id)return;const was=PR.get(r.id);PR.set(r.id,r);if(r.id===U.id){ME=r;return}
+   if(isPro(r)&&!(was&&isPro(was)))newMember(r);refresh()})
+ .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},pl=>{const m=pl.new;if(!m||(m.sender!==U.id&&m.recipient!==U.id)||MSG.some(x=>x.id===m.id))return;MSG.push(m);onMsg(m)})
+ .on("postgres_changes",{event:"*",schema:"public",table:"contracts"},pl=>{const c=pl.new;if(!c||(c.requester!==U.id&&c.recipient!==U.id))return;const old=CTR.find(x=>x.id===c.id);upsertC(c);
+   if(pl.eventType==="INSERT"&&c.recipient===U.id&&!old)toast(`<b>${e(pname(c.requester))}</b> ${c.status==="demande"?"vous envoie une demande de partenariat.":"vous envoie un contrat à signer."}`,()=>{tab="k";draw();showK(c.id)});
+   else if(old&&old.status!==c.status){if(c.requester===U.id)toast(`<b>${e(pname(c.recipient))}</b> : ${e(c.title)} → ${ST[c.status]}`,()=>{tab="k";draw();showK(c.id)});else if(c.status==="envoye")toast(`<b>${e(pname(c.requester))}</b> a rédigé le contrat : à signer.`,()=>{tab="k";draw();showK(c.id)})}
+   refresh()})
+ .subscribe();
+ Promise.resolve(sb.realtime&&sb.realtime.setAuth?sb.realtime.setAuth():null).catch(()=>{}).then(()=>sb.channel("user:"+U.id,{config:{private:true}}).on("broadcast",{event:"signal"},m=>onSignal(m.payload)).subscribe())}
+function refresh(){if(view==="list"&&$("v"))draw()}
+function newMember(r){if(!ready)return;const m=(r.skills||[]).filter(x=>hs(ME.skills,x)),same=r.city&&ME.city&&key(r.city)===key(ME.city);
+ if(m.length)ask(`<b>${e(r.name)}</b> vient de s’inscrire : <b>${e(m[0])}</b>${same?", dans votre ville ("+e(r.city)+")":(r.city?", à "+e(r.city):"")}.<br>Prêt à discuter ?`,()=>showP(r.id),"Voir le profil");
+ else toast(`<b>${e(r.name)}</b> vient de s’inscrire.`)}
+
+/* ---------- Profil (inscription et modification) ---------- */
+function onboard(){$("app").innerHTML=`<div class="top"><h1>Votre profil</h1></div><div class="view" id="v">${profileForm(true)}</div>`;profileBind(true)}
+function known(){const s=new Set(["menuiserie","couture","électricité","plomberie","maçonnerie","peinture","mécanique","coiffure","pâtisserie"]);PR.forEach(p=>(p.skills||[]).forEach(x=>s.add(x)));return[...s]}
+let PF={blob:null,sk:[],ty:"particulier"};
+function profileForm(first){const m=ME||{};PF={blob:null,sk:[...(m.skills||[])],ty:m.account_type||"particulier"};
+ return`<div class="form" style="text-align:center"><label style="cursor:pointer"><div id="ph" style="display:flex;justify-content:center">${av(m,96)}</div><input type="file" id="pf" accept="image/*" hidden></label><button type="button" class="btn o" id="psf" style="padding:8px 14px">Prendre un selfie</button><input type="file" id="pf2" accept="image/*" capture="user" hidden>
+<input id="pn" placeholder="Votre nom" value="${e(m.name)}"><div style="text-align:left"><button type="button" class="sk" id="t1">Particulier</button><button type="button" class="sk" id="t2">Entreprise</button></div><input id="pc" placeholder="Nom de l’entreprise" value="${e(m.company)}"><input id="pci" placeholder="Votre ville ou quartier" value="${e(m.city)}"><input id="psp" placeholder="Votre spécialité (ex. escaliers sur mesure)" value="${e(m.specialty)}"><input id="pye" type="number" inputmode="numeric" placeholder="Années d’expérience" value="${m.years?e(m.years):""}">
+<div style="display:flex;gap:8px"><input id="ski" list="dl" placeholder="Votre compétence (ex. menuisier)"><button type="button" class="btn o" id="ska">Ajouter</button></div><div id="skc" style="text-align:left"></div><datalist id="dl"></datalist>
+<textarea id="pbio" rows="3" placeholder="Décrivez votre expérience et vos réalisations">${e(m.bio)}</textarea><label style="text-align:left"><input type="checkbox" id="pav"${m.available?" checked":""}> Disponible pour de nouveaux projets</label><button class="btn" id="psv">${first?"Terminer mon inscription":"Enregistrer mon profil"}</button><p id="per" style="color:#C62828;margin:0"></p></div>`}
+function profileBind(first){
+ const setTy=t=>{PF.ty=t;$("t1").className="sk"+(t==="particulier"?" on":"");$("t2").className="sk"+(t==="entreprise"?" on":"");$("pc").style.display=t==="entreprise"?"block":"none"};
+ setTy(PF.ty);$("t1").onclick=()=>setTy("particulier");$("t2").onclick=()=>setTy("entreprise");
+ const pick=ev=>{const f=ev.target.files[0];ev.target.value="";if(f)shrink(f,512,b=>{PF.blob=b;$("ph").innerHTML=`<div class="av" style="width:96px;height:96px;background-image:url(${URL.createObjectURL(b)})"></div>`})};
+ $("pf").onchange=pick;$("pf2").onchange=pick;$("psf").onclick=()=>$("pf2").click();
+ $("dl").innerHTML=known().map(k=>`<option value="${e(k)}">`).join("");
+ const paint=()=>{$("skc").innerHTML=PF.sk.map((k,i)=>`<button type="button" class="sk on" data-i="${i}">${e(k)} ✕</button>`).join("");$("skc").querySelectorAll("button").forEach(b=>b.onclick=()=>{PF.sk.splice(+b.dataset.i,1);paint()})};
+ const add=()=>{const v=$("ski").value.trim().toLowerCase().slice(0,40);if(v&&!hs(PF.sk,v))PF.sk.push(v);$("ski").value="";paint()};
+ $("ska").onclick=add;$("ski").onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();add()}};paint();
+ $("psv").onclick=async()=>{add();const n=$("pn").value.trim(),co=PF.ty==="entreprise"?$("pc").value.trim():"",er=m=>{$("per").textContent=m};
+  if(!n||!PF.sk.length||(PF.ty==="entreprise"&&!co))return er("Indiquez votre nom, au moins une compétence (et le nom de l’entreprise).");
+  $("psv").disabled=true;
+  const patch={name:n.slice(0,80),account_type:PF.ty,company:co?co.slice(0,80):null,city:$("pci").value.trim().slice(0,80)||null,specialty:$("psp").value.trim().slice(0,80)||null,years:Math.max(0,Math.min(60,parseInt($("pye").value)||0)),bio:$("pbio").value.trim().slice(0,400)||null,available:$("pav").checked,skills:PF.sk.slice(0,12)};
+  if(PF.blob){const path=`${U.id}/p${Date.now()}.jpg`,up=await sb.storage.from("avatars").upload(path,PF.blob,{contentType:"image/jpeg"});if(up.error){$("psv").disabled=false;return er("Photo non envoyée : "+up.error.message)}patch.photo_path=path}
+  const r=await sb.from("profiles").update(patch).eq("id",U.id).select().single();$("psv").disabled=false;
+  if(r.error)return er("Enregistrement impossible : "+r.error.message);
+  ME=r.data;PR.set(U.id,ME);if(first)shell();else{toast("Profil enregistré.");draw()}}}
+
+/* ---------- Structure de l'application ---------- */
+function shell(){view="list";
+ $("app").innerHTML=`<div class="top" id="tp"></div><div class="view" id="v" style="position:relative"></div><nav id="nv">${[["c","Discussions"],["k","Contrats"],["p","Profil"]].map(x=>`<button data-t="${x[0]}"><svg viewBox="0 0 24 24"><path d="${IC[x[0]]}"/></svg>${x[1]}</button>`).join("")}</nav>`;
+ document.querySelectorAll("#nv button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});draw()}
+function draw(){view="list";peer=null;CHAT=null;
+ document.querySelectorAll("#nv button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===tab));$("nv").style.display="flex";
+ $("tp").innerHTML=`<h1>${{c:"Discussions",k:"Contrats",p:"Profil"}[tab]}</h1>`;
+ const v=$("v");v.style.cssText="position:relative";
+ if(tab==="c")renderC(v);else if(tab==="k")renderK(v);else renderP(v)}
+function sub(title){view="sub";$("tp").innerHTML=`<button id="bk">←</button><h1>${title}</h1>`;$("nv").style.display="flex";$("v").style.cssText="position:relative";$("bk").onclick=draw}
+
+/* ---------- Discussions et annuaire ---------- */
+function pros(){const me=ME;return[...PR.values()].filter(p=>p.id!==U.id&&isPro(p)).filter(p=>{
+ if(Q&&!(nz([p.name,(p.skills||[]).join(" "),p.specialty,p.company].join(" ")).includes(nz(Q))||hs(p.skills,Q)))return false;
+ if(QC&&!nz(p.city).includes(nz(QC)))return false;if(QA&&!p.available)return false;return true})
+ .map(p=>({p,s:((p.skills||[]).some(x=>hs(me.skills,x))?3:0)+(p.city&&me.city&&key(p.city)===key(me.city)?2:0)+(p.available?1:0)})).sort((a,b)=>b.s-a.s||a.p.name.localeCompare(b.p.name)).map(x=>x.p)}
+function resHTML(){const l=pros();return`<div class="sec">Professionnels (${l.length})</div>`+(l.map(p=>`<div class="item" data-p="${p.id}">${av(p)}<div class="b"><b>${e(p.name)}</b><p>${e(label(p))}${p.years?" · "+p.years+" ans":""}${p.city?" · "+e(p.city):""}</p>${p.available?'<p style="color:#2E9E5B">● Disponible</p>':""}</div></div>`).join("")||'<p style="padding:12px 16px;color:var(--mute)">Aucun professionnel ne correspond pour le moment. Vous serez prévenu dès qu’il en arrive un.</p>')}
+function rd(id){return Number(ls.get("mayschat_read_"+id))||0}
+function markRead(id){const l=MSG.filter(m=>m.sender===id||m.recipient===id);if(l.length)ls.set("mayschat_read_"+id,String(new Date(l[l.length-1].created_at).getTime()))}
+function convs(){const o=new Map();MSG.forEach(m=>{const id=m.sender===U.id?m.recipient:m.sender,c=o.get(id)||{id,unread:0};c.last=m;if(m.sender!==U.id&&new Date(m.created_at).getTime()>rd(id))c.unread++;o.set(id,c)});return[...o.values()].sort((a,b)=>new Date(b.last.created_at)-new Date(a.last.created_at))}
+function upRes(){const r=$("fres");r.innerHTML=resHTML();bindP(r)}
+function bindP(root){root.querySelectorAll("[data-p]").forEach(x=>x.onclick=()=>showP(x.dataset.p))}
+function renderC(v){const st='style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)"';
+ v.innerHTML=`<div style="padding:10px 16px 0;display:flex;flex-direction:column;gap:8px"><input id="q" placeholder="Chercher un métier ou une spécialité…" value="${e(Q)}" ${st}><input id="qc" placeholder="Ville" value="${e(QC)}" ${st}><label style="font-size:14px"><input type="checkbox" id="qa"${QA?" checked":""}> Disponibles seulement</label></div><div id="fres">${resHTML()}</div><div class="sec">Discussions</div>`+
+ (convs().map(c=>{const p=PR.get(c.id)||{id:c.id,name:"Membre"};return`<div class="item" data-c="${c.id}"><span data-pa="${c.id}">${av(p)}</span><div class="b"><b>${e(p.name)}</b><p>${e(c.last.body||"📷 Photo")}</p></div><div class="meta">${hhmm(c.last.created_at)}${c.unread?`<br><span class="badge">${c.unread}</span>`:""}</div></div>`}).join("")||'<p style="padding:16px;color:var(--mute)">Aucune discussion. Touchez un professionnel pour commencer.</p>');
+ $("q").oninput=ev=>{Q=ev.target.value;upRes()};$("qc").oninput=ev=>{QC=ev.target.value;upRes()};$("qa").onchange=ev=>{QA=ev.target.checked;upRes()};bindP(v);
+ v.querySelectorAll("[data-c]").forEach(x=>x.onclick=()=>openChat(x.dataset.c));
+ v.querySelectorAll("[data-pa]").forEach(x=>x.onclick=ev=>{ev.stopPropagation();showP(x.dataset.pa)})}
+function showP(id){const p=PR.get(id);if(!p)return;sub("Profil");
+ const row=(a,b)=>b?`<p style="margin:0"><span style="color:var(--mute)">${a} :</span> ${e(b)}</p>`:"";
+ $("v").innerHTML=`<div class="form" style="text-align:center"><div style="display:flex;justify-content:center">${av(p,96)}</div><h2 style="margin:0">${e(p.name)}</h2><p style="margin:0;color:var(--mute)">${e(label(p))}</p>${p.available?'<p style="margin:0;color:#2E9E5B;font-weight:600">● Disponible pour de nouveaux projets</p>':""}<div style="background:var(--bg2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left">${row("Spécialité",p.specialty||(p.skills||[]).join(", "))}${row("Expérience",p.years?p.years+" ans":"")}${row("Ville",p.city)}${p.account_type==="entreprise"?row("Entreprise",p.company):""}${row("À propos",p.bio)}</div><div style="text-align:left">${(p.skills||[]).map(s=>`<span class="sk${hs(ME.skills,s)?" on":""}" style="cursor:default;text-transform:none">${e(s)}</span>`).join("")}</div><button class="btn" id="pd">Discuter</button><button class="btn o" id="pp2">Demander un partenariat</button></div>`;
+ $("pd").onclick=()=>openChat(id);$("pp2").onclick=()=>askPartner(id)}
+
+/* ---------- Conversation ---------- */
+function needImg(path){if(!CHATIMG_RE.test(path)||IMG[path]||PEND[path])return;PEND[path]=1;sb.storage.from("chat-images").createSignedUrl(path,3600).then(r=>{delete PEND[path];if(r.data&&r.data.signedUrl){IMG[path]=r.data.signedUrl;CHAT&&CHAT()}})}
+function rbUpd(){const r=$("rb");if(!r)return;r.style.display=REPLY?"block":"none";r.textContent=REPLY?"↩ "+REPLY+"  (toucher pour annuler)":""}
+function thread(){return MSG.filter(m=>(m.sender===U.id&&m.recipient===peer)||(m.sender===peer&&m.recipient===U.id))}
+function paintChat(){const ch=$("ch");if(!ch)return;const L=thread();
+ ch.innerHTML=L.map((m,k)=>{let im="";if(m.image_path){needImg(m.image_path);im=IMG[m.image_path]?`<img src="${IMG[m.image_path]}" style="max-width:100%;border-radius:8px;display:block;margin-bottom:4px">`:'<div style="opacity:.6">📷 …</div>'}
+  return`<div class="m${m.sender===U.id?" me":""}${k===L.length-1?" last":""}" data-k="${k}">${m.reply_to?`<div class="rp">${e(m.reply_to)}</div>`:""}${im}${e(m.body)}<small>${hhmm(m.created_at)}${m.sender===U.id?" ✓✓":""}</small></div>`}).join("")||'<p style="color:var(--mute);text-align:center">Dites bonjour et présentez votre projet.</p>';
+ ch.scrollTop=1e6;ch.querySelectorAll(".m").forEach(x=>x.onclick=()=>{const m=L[+x.dataset.k];REPLY=(m.body||"📷 Photo").slice(0,70);rbUpd();$("tx").focus()})}
+function openChat(id,after){const p=PR.get(id);if(!p)return;peer=id;view="chat";REPLY="";markRead(id);$("nv").style.display="none";
+ $("tp").innerHTML=`<button id="bk">←</button><div id="hp" style="display:flex;gap:10px;align-items:center;flex:1;cursor:pointer">${av(p,38)}<div><b>${e(p.name)}</b><div style="font-size:12px;opacity:.8">${e(label(p))}</div></div></div><button id="vc" title="Appel vidéo">📹</button><button id="pt" title="Demander un partenariat">🤝</button>`;
+ const v=$("v");v.style.cssText="display:flex;flex-direction:column;overflow:hidden";
+ v.innerHTML=`<div class="chat" id="ch"></div><div id="rb" class="rp" style="display:none;margin:0;border-radius:0;padding:6px 12px;background:var(--bg2);cursor:pointer"></div><div class="bar"><button class="send" id="ga" style="background:var(--bg);color:var(--ink)" title="Photos">🖼️</button><button class="send" id="ca" style="background:var(--bg);color:var(--ink)" title="Appareil photo">📷</button><input id="tx" placeholder="Message"><button class="send" id="sd">➤</button><input type="file" id="fg" accept="image/*" hidden><input type="file" id="fc" accept="image/*" capture="environment" hidden></div>`;
+ CHAT=paintChat;paintChat();
+ $("bk").onclick=draw;$("hp").onclick=()=>showP(id);$("pt").onclick=()=>askPartner(id);$("vc").onclick=()=>startCall(id);$("rb").onclick=()=>{REPLY="";rbUpd()};
+ $("sd").onclick=()=>{const t=$("tx").value.trim();if(t){$("tx").value="";sendMsg(t)}};$("tx").onkeydown=ev=>{if(ev.key==="Enter")$("sd").click()};
+ $("ga").onclick=()=>$("fg").click();$("ca").onclick=()=>$("fc").click();
+ [$("fg"),$("fc")].forEach(f=>f.onchange=()=>{const fl=f.files[0];f.value="";if(fl)shrink(fl,900,async b=>{const path=`${U.id}/${id}/${Date.now()}.jpg`,up=await sb.storage.from("chat-images").upload(path,b,{contentType:"image/jpeg"});if(up.error)return toast("Photo non envoyée : "+e(up.error.message));sendMsg("",path)})});
+ if(after)after()}
+async function sendMsg(body,imgPath){const row={recipient:peer,body:body||"",reply_to:REPLY||null};if(imgPath)row.image_path=imgPath;REPLY="";rbUpd();
+ const r=await sb.from("messages").insert(row).select().single();if(r.error)return toast("Message non envoyé : "+e(r.error.message));
+ if(!MSG.some(x=>x.id===r.data.id))MSG.push(r.data);if(view==="chat")paintChat();markRead(r.data.recipient)}
+function onMsg(m){const id=m.sender===U.id?m.recipient:m.sender;
+ if(view==="chat"&&peer===id){paintChat();if(m.sender!==U.id)markRead(id);return}
+ if(m.sender!==U.id)toast(`<b>${e(pname(id))}</b> : ${e((m.body||"📷 Photo").slice(0,60))}`,()=>openChat(id));refresh()}
+
+/* ---------- Partenariats et contrats ---------- */
+function suggest(p){return`Bonjour ${(p.name||"").split(" ")[0]}, je suis ${ME.specialty||(ME.skills&&ME.skills[0])||"professionnel"}${ME.city?" à "+ME.city:""}${ME.years?", avec "+ME.years+" ans d’expérience":""}. Je cherche à collaborer avec un(e) ${(p.skills&&p.skills[0])||"professionnel"}. Seriez-vous disponible pour en discuter ?`}
+function upsertC(c){const i=CTR.findIndex(x=>x.id===c.id);if(i<0)CTR.push(c);else CTR[i]=c}
+async function askPartner(id){const p=PR.get(id);const m=prompt("✨ Texte suggéré, modifiez-le si besoin :",suggest(p));if(!m||!m.trim())return;const txt=m.trim().slice(0,300);
+ const r=await sb.from("contracts").insert({recipient:id,kind:"Partenariat",title:"Demande de partenariat",description:txt,status:"demande"}).select().single();
+ if(r.error)return toast("Demande non envoyée : "+e(r.error.message));upsertC(r.data);toast("Demande envoyée.");
+ peer=id;await sendMsg("Demande de partenariat : "+txt);if(view!=="chat")openChat(id)}
+function renderK(v){const l=CTR.filter(c=>c.requester===U.id||c.recipient===U.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ v.innerHTML='<p style="padding:12px 16px 0;margin:0;color:var(--mute);font-size:13px">Les demandes de partenariat et les contrats signés avec d’autres membres.</p>'+(l.length?l.map(c=>{const mine=c.requester===U.id;return`<div class="item" data-c="${c.id}"><div class="b"><b>${e(c.title)}</b><p>${mine?"Pour "+e(pname(c.recipient)):"De "+e(pname(c.requester))} · ${e(c.kind)}</p></div><div class="meta"><span class="badge" style="background:${c.status==="signe"?"#2E9E5B":c.status==="refuse"?"#C62828":"var(--acc)"};color:#fff">${ST[c.status]}</span></div></div>`}).join(""):'<p style="padding:24px 16px;color:var(--mute)">Aucun contrat pour le moment. Ouvrez un profil et touchez « Demander un partenariat ».</p>');
+ v.querySelectorAll("[data-c]").forEach(x=>x.onclick=()=>showK(x.dataset.c))}
+async function cupd(id,patch){const r=await sb.from("contracts").update(patch).eq("id",id).select().single();if(r.error)toast("Action refusée : "+e(r.error.message));else upsertC(r.data);showK(id)}
+function showK(id){const c=CTR.find(x=>String(x.id)===String(id));if(!c)return;const isTo=c.recipient===U.id,isFrom=c.requester===U.id,ask_=c.status==="demande"||c.status==="discussion";sub(ask_?"Demande":"Contrat");
+ const row=(a,b)=>b?`<p style="margin:0"><span style="color:var(--mute)">${a} :</span> ${e(b)}</p>`:"",mu=t=>`<p style="margin:0;color:var(--mute)">${t}</p>`;let acts="";
+ if(c.status==="demande")acts=isTo?'<button class="btn" id="a1">Accepter la demande</button><button class="btn o" id="a2">Refuser</button>':mu("En attente de la réponse de "+e(pname(c.recipient))+".");
+ else if(c.status==="discussion")acts=isFrom?'<button class="btn" id="a3">Accord trouvé : rédiger le contrat</button>':mu("Vous discutez. "+e(pname(c.requester))+" rédigera le contrat quand vous serez d’accord.");
+ else if(c.status==="envoye"&&isTo)acts='<input id="sg" placeholder="Tapez votre nom complet pour signer"><button class="btn" id="ok">Signer le contrat</button><button class="btn o" id="rf">Refuser</button>';
+ const other=isFrom?c.recipient:c.requester;
+ $("v").innerHTML=`<div class="form"><h2 style="margin:0">${e(c.title)}</h2>${mu(e(c.kind))}<div style="background:var(--bg2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px">${row("Entre",pname(c.requester)+" et "+pname(c.recipient))}${row(ask_?"Message":"Accord",c.description)}${row("Montant",money(c.amount,c.currency))}${row("Date limite",c.due_date)}${row("Signé par",c.requester_signature?c.requester_signature+" (émetteur)":"")}${row("Signé par",c.recipient_signature?c.recipient_signature+" (destinataire)":"")}${row("Statut",ST[c.status])}</div>${acts}<button class="btn o" id="ct">Discuter avec ${e(pname(other))}</button>${mu("Modèle simple : une signature par nom tapé ne garantit pas une valeur juridique. Pour un enjeu important, faites relire par un professionnel.")}</div>`;
+ $("ct").onclick=()=>openChat(other);const on=(i,f)=>{if($(i))$(i).onclick=f};
+ on("a1",()=>cupd(c.id,{status:"discussion"}));on("a2",()=>cupd(c.id,{status:"refuse"}));on("a3",()=>draftK(c.id));
+ on("ok",()=>{const n=$("sg").value.trim();if(n.length<3)return toast("Tapez votre nom complet pour signer.");cupd(c.id,{status:"signe",recipient_signature:n.slice(0,120)})});on("rf",()=>cupd(c.id,{status:"refuse"}))}
+function draftK(id){const c=CTR.find(x=>x.id===id);sub("Rédiger le contrat");$("bk").onclick=()=>showK(id);
+ $("v").innerHTML=`<div class="form"><select id="kt">${KT.map(k=>`<option>${k}</option>`).join("")}</select><input id="kti" placeholder="Titre du contrat"><button type="button" class="btn o" id="ksug">✨ Suggérer un texte (à relire)</button><textarea id="kd" rows="5" placeholder="Ce qui a été convenu…"></textarea><div style="display:flex;gap:8px"><input id="kpr" type="number" inputmode="decimal" placeholder="Montant (facultatif)"><select id="kc">${CUR.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("")}</select></div><input id="kdt" type="date"><input id="ksg" placeholder="Votre signature : tapez votre nom complet"><button class="btn" id="kok">Signer et envoyer</button><p id="er" style="color:#C62828;margin:0"></p></div>`;
+ $("ksug").onclick=()=>{const t=$("kti").value.trim()||c.description.slice(0,60);$("kd").value=`Objet : ${t}.\nMontant : ${$("kpr").value?$("kpr").value+" "+$("kc").value:"à préciser"}.\nDélai : ${$("kdt").value||"à préciser"}.\nPaiement : acompte de 30 % à la signature, solde à la livraison.\nModification : tout changement doit être accepté par les deux parties.\nLitige : les parties cherchent d’abord une solution à l’amiable.\n(Suggestion automatique : à relire et adapter.)`};
+ $("kok").onclick=()=>{const t=$("kti").value.trim(),d=$("kd").value.trim(),sg=$("ksg").value.trim();if(!t||!d||sg.length<3){$("er").textContent="Indiquez un titre, l’accord et votre signature.";return}
+  const pr=parseFloat($("kpr").value),has=!isNaN(pr)&&pr>=0;
+  cupd(id,{kind:$("kt").value,title:t.slice(0,120),description:d.slice(0,4000),amount:has?pr:null,currency:has?$("kc").value:null,due_date:$("kdt").value||null,requester_signature:sg.slice(0,120),status:"envoye"})}}
+
+/* ---------- Mon profil ---------- */
+function renderP(v){v.innerHTML=profileForm(false)+`<div class="form" style="padding-top:0"><button class="btn o" id="lo">Se déconnecter</button><p style="margin:0;color:var(--mute);font-size:12px;text-align:center">${e(U.email||"")}</p></div>`;profileBind(false);
+ $("lo").onclick=async()=>{await sb.auth.signOut();sb.removeAllChannels&&sb.removeAllChannels();U=null;ME=null;PR=new Map();MSG=[];CTR=[];ready=false;tab="c";authScreen("login")}}
+/* ---------- Appels vidéo (WebRTC) ---------- */
+// Pour les réseaux mobiles stricts, ajoutez ici un serveur TURN (identifiants fournis par votre service TURN).
+const ICE=[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun.cloudflare.com:3478"}];
+let CALL=null,RING=null;
+function camErr(er){const n=er&&er.name;if(n==="NotAllowedError"||n==="PermissionDeniedError")return"Accès refusé. Autorisez la caméra et le micro (cadenas à côté de l’adresse du site), puis réessayez.";if(n==="NotFoundError"||n==="DevicesNotFoundError")return"Aucune caméra ou aucun micro détecté sur cet appareil.";if(n==="NotReadableError")return"La caméra est utilisée par une autre application.";return"Caméra indisponible ici. Ouvrez Mayschat dans Chrome ou Safari, à l’adresse https du site (pas dans un aperçu intégré)."}
+const fmtDur=ms=>{const s=Math.round(ms/1000);return Math.floor(s/60)+":"+("0"+s%60).slice(-2)};
+async function sendSig(to,kind,data){const r=await sb.rpc("send_signal",{target:to,kind:kind,data:data||{}});if(r.error)toast("Appel : "+e(r.error.message))}
+function callUI(id){const d=document.createElement("div");d.id="call";d.style.cssText="position:fixed;inset:0;z-index:60;background:#0b141a;color:#fff;display:flex;flex-direction:column";
+ const b=(i,t,bg)=>`<button id="${i}" title="${t}" style="width:58px;height:58px;border-radius:50%;border:0;background:${bg||"#ffffff26"};color:#fff;font-size:24px;cursor:pointer">${t.split(" ")[0]}</button>`;
+ d.innerHTML=`<video id="rv" autoplay playsinline style="flex:1;width:100%;object-fit:cover;background:#111"></video><video id="lv" autoplay playsinline muted style="position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:96px;height:128px;object-fit:cover;border-radius:12px;border:2px solid #fff4;background:#222"></video><div style="position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;text-shadow:0 1px 4px #000"><b style="font-size:18px">${e(pname(id))}</b><div id="cs" style="font-size:14px;opacity:.9">Appel en cours…</div></div><div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:14px;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(#0000,#000a)">${b("cm","🎤 Micro")}${b("cv","📷 Caméra")}${b("cf","🔄 Retourner")}${b("ce","📞 Raccrocher","#D32F2F")}</div>`;
+ document.body.appendChild(d);$("lv").srcObject=CALL.local;
+ $("cm").onclick=()=>{CALL.local.getAudioTracks().forEach(t=>t.enabled=!t.enabled);$("cm").style.opacity=CALL.local.getAudioTracks().some(t=>t.enabled)?1:.4};
+ $("cv").onclick=()=>{CALL.local.getVideoTracks().forEach(t=>t.enabled=!t.enabled);$("cv").style.opacity=CALL.local.getVideoTracks().some(t=>t.enabled)?1:.4};
+ $("cf").onclick=flipCam;$("ce").onclick=()=>endCall(true)}
+function mkPC(){const pc=new RTCPeerConnection({iceServers:ICE});CALL.pc=pc;
+ pc.onicecandidate=ev=>{if(ev.candidate&&CALL)sendSig(CALL.peer,"ice",ev.candidate.toJSON())};
+ pc.ontrack=ev=>{$("rv").srcObject=ev.streams[0]};
+ pc.onconnectionstatechange=()=>{if(!CALL)return;const s=pc.connectionState;if(s==="connected"){CALL.at=Date.now();clearTimeout(CALL.ring);$("cs").textContent="En ligne"}else if(s==="failed"){toast("Connexion impossible avec ce réseau. Réessayez, ou utilisez le Wi-Fi.");endCall(true)}};
+ CALL.local.getTracks().forEach(t=>pc.addTrack(t,CALL.local))}
+async function flipCam(){if(!CALL)return;const f=CALL.facing==="user"?"environment":"user";
+ try{const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:f}}),nt=s.getVideoTracks()[0],snd=CALL.pc.getSenders().find(x=>x.track&&x.track.kind==="video");if(snd)await snd.replaceTrack(nt);CALL.local.getVideoTracks().forEach(t=>{t.stop();CALL.local.removeTrack(t)});CALL.local.addTrack(nt);$("lv").srcObject=CALL.local;CALL.facing=f}catch(er){toast(e(camErr(er)))}}
+async function startCall(id){if(CALL||RING)return;let st;try{st=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:true})}catch(er){return toast(e(camErr(er)))}
+ CALL={peer:id,local:st,isCaller:true,pend:[],facing:"user"};callUI(id);mkPC();
+ const o=await CALL.pc.createOffer();await CALL.pc.setLocalDescription(o);sendSig(id,"offer",{sdp:o.sdp});
+ CALL.ring=setTimeout(()=>{toast("Pas de réponse.");endCall(true)},45000)}
+async function acceptCall(from,sdp,early){let st;try{st=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:true})}catch(er){sendSig(from,"decline");return toast(e(camErr(er)))}
+ CALL={peer:from,local:st,isCaller:false,pend:[],facing:"user"};callUI(from);mkPC();$("cs").textContent="Connexion…";
+ await CALL.pc.setRemoteDescription({type:"offer",sdp:sdp});for(const c of early)try{await CALL.pc.addIceCandidate(c)}catch(x){}
+ const a=await CALL.pc.createAnswer();await CALL.pc.setLocalDescription(a);sendSig(from,"answer",{sdp:a.sdp})}
+async function onSignal(p){if(!p||!p.from||p.from===U.id)return;const d=p.data||{};
+ if(p.kind==="offer"){if(CALL||RING)return sendSig(p.from,"busy");
+  const early=[];const el=ask(`<b>📹 ${e(pname(p.from))}</b> vous appelle en vidéo.`,()=>{clearTimeout(RING&&RING.t);RING=null;acceptCall(p.from,d.sdp,early)},"Répondre",false,()=>{clearTimeout(RING&&RING.t);RING=null;sendSig(p.from,"decline")});
+  RING={from:p.from,el:el,early:early,t:setTimeout(()=>{if(RING){el.remove();RING=null}},45000)};return}
+ if(p.kind==="ice"){if(CALL&&CALL.peer===p.from){if(CALL.pc.remoteDescription)try{await CALL.pc.addIceCandidate(d)}catch(x){}else CALL.pend.push(d)}else if(RING&&RING.from===p.from)RING.early.push(d);return}
+ if(p.kind==="answer"&&CALL&&CALL.peer===p.from){await CALL.pc.setRemoteDescription({type:"answer",sdp:d.sdp});for(const c of CALL.pend)try{await CALL.pc.addIceCandidate(c)}catch(x){}CALL.pend=[];return}
+ if((p.kind==="decline"||p.kind==="busy")&&CALL&&CALL.peer===p.from){toast(p.kind==="busy"?"Votre correspondant est déjà en appel.":"Appel refusé.");endCall(false);return}
+ if(p.kind==="hangup"){if(RING&&RING.from===p.from){RING.el.remove();clearTimeout(RING.t);RING=null;toast(`Appel manqué de <b>${e(pname(p.from))}</b>.`)}else if(CALL&&CALL.peer===p.from){toast("Appel terminé.");endCall(false)}}}
+function endCall(notify){if(!CALL)return;const c=CALL;CALL=null;clearTimeout(c.ring);if(notify)sendSig(c.peer,"hangup");try{c.pc&&c.pc.close()}catch(x){}c.local.getTracks().forEach(t=>t.stop());const el=$("call");if(el)el.remove();
+ if(c.isCaller)sb.from("messages").insert({recipient:c.peer,body:c.at?"📹 Appel vidéo terminé ("+fmtDur(Date.now()-c.at)+")":"📹 Appel manqué"}).select().single().then(r=>{if(r.data&&!MSG.some(x=>x.id===r.data.id)){MSG.push(r.data);if(view==="chat"&&peer===c.peer)paintChat();else refresh()}})}
+boot();
+
+</script>
+</body>
+</html>
